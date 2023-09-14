@@ -78,8 +78,7 @@ public class StudentService {
 
     public List<Student> queryForStudents() {
         // get a list of students
-        List<Student> result =  studentDAO.findAll();
-        return result;
+        return studentDAO.findAll();
         //display
 //        result.forEach(System.out ::println);
     }
