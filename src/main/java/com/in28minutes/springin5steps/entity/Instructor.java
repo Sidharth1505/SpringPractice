@@ -1,20 +1,14 @@
 package com.in28minutes.springin5steps.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "student")
-@NoArgsConstructor
-@Builder
-@AllArgsConstructor
-public class Student {
-    //define fields
+@Table(name = "instructor")
+public class Instructor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,30 +17,25 @@ public class Student {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-
     @Column(name = "email")
     private String email;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "instructor_detail_id")
+    private InstructorDetail instructor_detail;
+
+    @OneToMany(mappedBy = "instructor", cascade = {
             CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH
-    })
-    @JoinTable(
-            name = "course_student",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
+    }, fetch = FetchType.LAZY)
     private List<Course> courses;
+    public Instructor() {
+    }
 
-
-    //define constructors
-
-    public Student(String firstName, String lastName, String email) {
+    public Instructor(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
-
-    //define getters/setters
 
     public int getId() {
         return id;
@@ -80,6 +69,14 @@ public class Student {
         this.email = email;
     }
 
+    public InstructorDetail getInstructor_detail() {
+        return instructor_detail;
+    }
+
+    public void setInstructor_detail(InstructorDetail instructor_detail) {
+        this.instructor_detail = instructor_detail;
+    }
+
     public List<Course> getCourses() {
         return courses;
     }
@@ -88,21 +85,23 @@ public class Student {
         this.courses = courses;
     }
 
-    public void addCourse(Course course) {
-        if(courses == null) {
-            courses = new ArrayList<>();
-        }
-        courses.add(course);
-    }
-    //define toString
-
     @Override
     public String toString() {
-        return "Student{" +
+        return "Instructor{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", instructor_detail=" + instructor_detail +
                 '}';
+    }
+
+    //add convenience method for bi-direction
+    public void add(Course course) {
+        if(courses == null) {
+            courses = new ArrayList<>();
+        }
+        courses.add(course);
+        course.setInstructor(this);
     }
 }
